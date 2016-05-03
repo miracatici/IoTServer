@@ -92,7 +92,7 @@ public class ClientGUI {
 					try {
 						setChat(smartSocket.getMessage());
 					} catch (IOException e) {
-						setChat("Error occurs");
+						setChat("Error occured");
 						e.printStackTrace();
 					}
 		
@@ -136,28 +136,44 @@ public class ClientGUI {
 		});
 		btnExit.setBounds(385, 6, 65, 29);
 		frame.getContentPane().add(btnExit);
-		try {
-			s  = new Socket("178.62.193.160", 5758);
-		} catch (UnknownHostException e2) {
-			JOptionPane.showMessageDialog(null,"Host is unknown","Error", JOptionPane.WARNING_MESSAGE);
-			e2.printStackTrace();
-		} catch (IOException e2) {
-			JOptionPane.showMessageDialog(null,"Connection cannot established","Error", JOptionPane.WARNING_MESSAGE);
-			e2.printStackTrace();
-		}
+		
 		btnConnect.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				setChat("Connection is done");
-				smartSocket = new SmartSocket(s,txtName.getText());
-				messageThread.start();
-				btnConnect.setEnabled(false);
-				txtMessage.setEnabled(true);
-				btnSend.setEnabled(true);
-				btnStop.setEnabled(true);
+				try {
+					System.out.println("Name:"+txtName.getText()+"=");
+					if (txtName.getText().equals("")){
+						txtName.setText("Client 1");
+					}
+					s  = new Socket("178.62.193.160", 5758);
+					smartSocket = new SmartSocket(s,txtName.getText());
+					messageThread.start();
+					btnConnect.setEnabled(false);
+					txtMessage.setEnabled(true);
+					btnSend.setEnabled(true);
+					btnStop.setEnabled(true);
+					setChat("Connection is done");
+					JOptionPane.showMessageDialog(null,"Connection is established","Done", JOptionPane.INFORMATION_MESSAGE);
+				} catch (UnknownHostException e2) {
+					JOptionPane.showMessageDialog(null,"Host is unknown","Error", JOptionPane.WARNING_MESSAGE);
+					e2.printStackTrace();
+				} catch (IOException e2) {
+					JOptionPane.showMessageDialog(null,"Connection cannot established","Error", JOptionPane.WARNING_MESSAGE);
+					e2.printStackTrace();
+				}
 			}			
 		});
 		frame.getContentPane().add(btnConnect);
+		
+		JButton btnReplyAll = new JButton("Reply All");
+		btnReplyAll.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				smartSocket.sendMessage("all", txtMessage.getText());
+				setChat(txtMessage.getText());
+			}
+		});
+		btnReplyAll.setBounds(6, 155, 94, 29);
+		frame.getContentPane().add(btnReplyAll);
 	}
 	public static void setChat(String mes){
 		String lines = chatPane.getText();
