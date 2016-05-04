@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.util.Iterator;
 
 public class SmartServerThread extends Thread {
 	private SmartSocket socket;
@@ -12,7 +13,14 @@ public class SmartServerThread extends Thread {
 			try {
 				String mes = socket.getMessage();
 				String[] line = mes.split("\t");
-				SmartServer.deviceList.get(line[0]).sendMessage(line[1]);
+				if(!(line[0].equals("all"))){
+					SmartServer.deviceList.get(line[0]).sendMessage(line[1]);
+				} else {
+					Iterator<SmartSocket> it = SmartServer.deviceList.values().iterator();
+					while (it.hasNext()){
+						it.next().sendMessage(line[1]);
+					}
+				}
 			} catch (IOException e) {
 				System.out.println("Message cannot be received");
 				try {

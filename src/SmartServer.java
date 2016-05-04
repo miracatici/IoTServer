@@ -17,10 +17,10 @@ public class SmartServer {
 			System.out.println("Server is established");
 			while(true){
 				Socket s = server.accept();
-				System.out.println("accepted");
+				System.out.println("Client accepted");
 				BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
 				String name = in.readLine();
-				System.out.println("name is "+ name);
+				System.out.println("Client name is "+ name);
 				SmartSocket device = new SmartSocket(s,name);
 				deviceList.put(name, device);
 				System.out.println(name +" is connected");
