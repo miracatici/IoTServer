@@ -1,10 +1,13 @@
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JSlider;
+import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -16,7 +19,7 @@ import jssc.SerialPortException;
 public class MotoDrive {
 	SerialPort serialPort ;
 	private JFrame frame;
-
+	boolean up  = false, down  = false, left  = false, right = false;
 	/**
 	 * Launch the application.
 	 */
@@ -49,6 +52,34 @@ public class MotoDrive {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 		
+		
+		
+		final JSlider speed = new JSlider();
+		speed.setEnabled(false);
+		speed.setOrientation(SwingConstants.VERTICAL);
+		speed.setBounds(135, 6, 36, 266);
+		speed.setMinimum(0); speed.setMaximum(255);
+		speed.setValue(0);
+		speed.addChangeListener(new ChangeListener(){
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				try {
+					serialPort.writeInt(speed.getValue());
+				} catch (SerialPortException e1) {
+//					e1.printStackTrace();
+				}
+			}
+		});
+		frame.getContentPane().add(speed);
+		
+		final JSlider rotation = new JSlider();
+		rotation.setEnabled(false);
+		rotation.setBounds(158, 126, 286, 29);
+		rotation.setMinimum(-255); rotation.setMaximum(255);
+		rotation.setValue(0);
+
+		frame.getContentPane().add(rotation);
+		
 		final JButton btnConnect = new JButton("Connect");
 		btnConnect.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -77,6 +108,8 @@ public class MotoDrive {
 //							System.out.println(event.getEventType() + " "+ event.getPortName());
 						}
 					}, SerialPort.MASK_RXCHAR);
+				    speed.setEnabled(true);
+				    rotation.setEnabled(true);
 				}
 				catch (SerialPortException ex) {
 				    System.out.println("There are an error on writing string to port т: " + ex);
@@ -87,20 +120,106 @@ public class MotoDrive {
 		btnConnect.setBounds(6, 22, 117, 29);
 		frame.getContentPane().add(btnConnect);
 		
-		final JSlider slider = new JSlider();
-		slider.setBounds(6, 79, 374, 29);
-		slider.setMinimum(0); slider.setMaximum(255);
-		slider.setValue(0);
-		slider.addChangeListener(new ChangeListener(){
+		JButton btnNavigation = new JButton("Navigation");
+		btnNavigation.setFocusable(true);
+		btnNavigation.setBounds(222, 22, 117, 29);
+		frame.getContentPane().add(btnNavigation);
+		
+		btnNavigation.addKeyListener(new KeyListener(){
 			@Override
-			public void stateChanged(ChangeEvent e) {
-				try {
-					serialPort.writeInt(slider.getValue());
-				} catch (SerialPortException e1) {
-//					e1.printStackTrace();
-				}
+			public void keyTyped(KeyEvent e) {
+			}
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+				int keyCode = e.getKeyCode();
+			    switch( keyCode ) { 
+			        case KeyEvent.VK_UP:
+			        	if(!up){
+			        		up = true;
+				        	System.out.println("Up Pres");
+				        	break;
+			        	}
+			        case KeyEvent.VK_DOWN:
+			        	if(!down){
+			        		down = true;
+				        	System.out.println("Down Pres");
+				        	break;
+			        	}
+			        case KeyEvent.VK_LEFT:
+			        	if(!left){
+			        		left = true;
+				        	System.out.println("Left Pres");
+				        	break;
+			        	}
+			        case KeyEvent.VK_RIGHT :
+			        	if(!right){
+			        		right = true;
+				        	System.out.println("Right Pres");
+				        	break;
+			        	}
+			    }
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+				int keyCode = e.getKeyCode();
+			    switch( keyCode ) { 
+			        case KeyEvent.VK_UP:
+			        	if(up){
+			        		up = false;
+				        	System.out.println("Up Rels");
+				        	break;
+			        	}
+			        case KeyEvent.VK_DOWN:
+			        	if(down){
+			        		down = false;
+				        	System.out.println("Down Rels");
+				        	break;
+			        	}
+			        case KeyEvent.VK_LEFT:
+			        	if(left){
+			        		left = false;
+				        	System.out.println("Left Rels");
+				        	break;
+			        	}
+			        case KeyEvent.VK_RIGHT :
+			        	if(right){
+			        		right = false;
+				        	System.out.println("Right Rels");
+				        	break;
+			        	}
+			    }
 			}
 		});
-		frame.getContentPane().add(slider);
+	}
+	public void forward(int a){
+		if(a == 0){
+			
+		} else {
+			
+		}
+	}
+	public void backward(int a){
+		if(a == 0){
+			
+		} else {
+			
+		}
+	}
+	public void left(int a){
+		if(a == 0){
+			
+		} else {
+			
+		}	
+	}
+	public void right(int a){
+		if(a == 0){
+			
+		} else {
+			
+		}
 	}
 }
+
