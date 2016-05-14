@@ -3,9 +3,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.ServerSocket;
+import java.net.Socket;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JSlider;
 import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
@@ -17,6 +23,7 @@ import jssc.SerialPortEventListener;
 import jssc.SerialPortException;
 
 public class MotoDrive {
+	BufferedReader input;
 	SerialPort serialPort ;
 	private JFrame frame;
 	boolean up  = false, down  = false, left  = false, right = false;
@@ -145,12 +152,12 @@ public class MotoDrive {
 		btnConnect.setBounds(6, 22, 117, 29);
 		frame.getContentPane().add(btnConnect);
 		
-		JButton btnNavigation = new JButton("Navigation");
+		final JButton btnNavigation = new JButton("Navigation");
 		btnNavigation.setFocusable(true);
 		btnNavigation.setBounds(222, 22, 117, 29);
 		frame.getContentPane().add(btnNavigation);
 		
-		JButton btnStop = new JButton("Stop");
+		final JButton btnStop = new JButton("Stop");
 		btnStop.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
@@ -162,6 +169,61 @@ public class MotoDrive {
 		});
 		btnStop.setBounds(6, 92, 58, 29);
 		frame.getContentPane().add(btnStop);
+		
+		final JLabel lblConnection = new JLabel("Connection");
+		lblConnection.setBounds(16, 201, 95, 16);
+		frame.getContentPane().add(lblConnection);
+		
+		JButton btnServerMode = new JButton("Server Mode");
+		btnServerMode.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				btnConnect.setEnabled(false);
+				btnNavigation.setEnabled(false);
+				btnStop.setEnabled(false);
+				speed.setEnabled(false);
+				
+				try {
+					ServerSocket server = new ServerSocket(8890);
+					lblConnection.setText("Waiting");
+					Socket socket = server.accept();
+					lblConnection.setText("Connected");
+					input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+					new Thread(new Runnable(){
+						@Override
+						public void run() {
+							while(true){
+								try {
+									String mes = input.readLine();
+									String[] line = mes.split("\t");
+									switch (line[0]){
+										case "f":
+											serialPort.writeByte(f);
+											serialPort.writeString(line[1]);
+											break;
+										case "b":
+											serialPort.writeByte(b);
+											serialPort.writeString(line[1]);
+											break;
+										case "s":
+											serialPort.writeByte(s);
+											break;
+									}
+								} catch (IOException | SerialPortException e) {
+									e.printStackTrace();
+									break;
+								}
+							}
+						}
+					}).start();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
+		btnServerMode.setBounds(6, 164, 117, 29);
+		frame.getContentPane().add(btnServerMode);
+		
+		
 		
 		btnNavigation.addKeyListener(new KeyListener(){
 			@Override
