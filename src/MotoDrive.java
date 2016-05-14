@@ -47,6 +47,7 @@ public class MotoDrive {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
+		final byte f = 'f';  final byte b = 'b';  final byte r = 'r';  final byte l = 'l'; final byte s = 's';
 		frame = new JFrame();
 		frame.setBounds(100, 100, 450, 300);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -58,13 +59,20 @@ public class MotoDrive {
 		speed.setEnabled(false);
 		speed.setOrientation(SwingConstants.VERTICAL);
 		speed.setBounds(135, 6, 36, 266);
-		speed.setMinimum(0); speed.setMaximum(255);
+		speed.setMinimum(-255); speed.setMaximum(255);
 		speed.setValue(0);
 		speed.addChangeListener(new ChangeListener(){
 			@Override
 			public void stateChanged(ChangeEvent e) {
 				try {
-					serialPort.writeInt(speed.getValue());
+					int speedVal = speed.getValue();
+					if (speed.getValue()>0){
+						serialPort.writeByte(f);
+					} else {
+						serialPort.writeByte(b);
+					}
+					serialPort.writeString(String.valueOf(Math.abs(speedVal)));
+//					System.out.println(speedVal);
 				} catch (SerialPortException e1) {
 //					e1.printStackTrace();
 				}
@@ -77,13 +85,30 @@ public class MotoDrive {
 		rotation.setBounds(158, 126, 286, 29);
 		rotation.setMinimum(-255); rotation.setMaximum(255);
 		rotation.setValue(0);
+		rotation.addChangeListener(new ChangeListener(){
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				try {
+					int speedVal = rotation.getValue();
+					if (rotation.getValue()>0){
+						serialPort.writeByte(r);
+					} else {
+						serialPort.writeByte(l);
+					}
+					serialPort.writeString(String.valueOf(Math.abs(speedVal)));
+//					System.out.println(speedVal);
+				} catch (SerialPortException e1) {
+//					e1.printStackTrace();
+				}
+			}
+		});
 
 		frame.getContentPane().add(rotation);
 		
 		final JButton btnConnect = new JButton("Connect");
 		btnConnect.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				serialPort = new SerialPort("/dev/tty.usbmodem1421");
+				serialPort = new SerialPort("/dev/tty.usbmodem1411");
 				try {
 				    serialPort.openPort();
 
@@ -124,6 +149,19 @@ public class MotoDrive {
 		btnNavigation.setFocusable(true);
 		btnNavigation.setBounds(222, 22, 117, 29);
 		frame.getContentPane().add(btnNavigation);
+		
+		JButton btnStop = new JButton("Stop");
+		btnStop.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					serialPort.writeByte(s);
+				} catch (SerialPortException e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
+		btnStop.setBounds(6, 92, 58, 29);
+		frame.getContentPane().add(btnStop);
 		
 		btnNavigation.addKeyListener(new KeyListener(){
 			@Override
