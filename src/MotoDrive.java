@@ -292,7 +292,9 @@ public class MotoDrive {
 			    }
 			}
 		});
+		System.out.println("sistem inital bitti");
 	}
+
 	public void forward(int a){
 		if(a == 0){
 			

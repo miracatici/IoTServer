@@ -11,7 +11,7 @@ public class SerialComm   {
 	public static void main (String[] args){
 		BufferedReader user = new BufferedReader(new InputStreamReader(System.in));
 		final SerialPort serialPort ;
-		serialPort = new SerialPort("/dev/tty.usbmodem1411");
+		serialPort = new SerialPort("/dev/tty.ACM0");
 		try {
 		    serialPort.openPort();
 

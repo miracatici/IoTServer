@@ -5,42 +5,42 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-
-import org.apache.sanselan.ImageReadException;
-import org.apache.sanselan.Sanselan;
 
 public class WClient {
 	public static void main (String[] arsg){
 		JFrame panel = new JFrame();
 		JLabel label = new JLabel();
-		label.setSize(new Dimension(320,240));
-		panel.setSize(new Dimension(320,240));
+		label.setSize(new Dimension(500,500));
+		panel.setSize(new Dimension(500,500));
 		panel.add(label);
 		panel.setVisible(true);
 		Socket ss =  null;
 		BufferedInputStream input = null;
 		try {
-			ss  = new Socket("localhost", 5758);
+			ss  = new Socket("192.168.1.5", 5758);
 			input = new BufferedInputStream(ss.getInputStream());
 			while(true){
-				BufferedImage img = Sanselan.getBufferedImage(input);
+				BufferedImage img = ImageIO.read(input);
 				if(img !=null){
 					label.setIcon(new ImageIcon(img));
 					label.repaint();
+//				} else {
+//					System.out.println("Image null");
 				}
-				Thread.sleep(160);	
+//				Thread.sleep(50);	
 			}
 		} catch (UnknownHostException e1) {
 			e1.printStackTrace();
 		} catch (IOException e1) {
 			e1.printStackTrace();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} catch (ImageReadException e) {
-			e.printStackTrace();
+//		} catch (InterruptedException e) {
+//			e.printStackTrace();
+//		} catch (ImageReadException e) {
+//			e.printStackTrace();
 		} 
 	}
 }
